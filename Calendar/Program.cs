@@ -1,7 +1,11 @@
+using Calendar.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<DatabaseService>();
 
 var app = builder.Build();
 
@@ -23,5 +27,12 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Initialize database
+using (var scope = app.Services.CreateScope())
+{
+    var dbService = scope.ServiceProvider.GetRequiredService<DatabaseService>();
+    dbService.InitializeDatabase();
+}
 
 app.Run();
